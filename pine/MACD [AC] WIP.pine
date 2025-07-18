@@ -1,0 +1,10 @@
+//@version=6
+indicator(title="Moving Average Convergence Divergence", shorttitle="MACD", timeframe="", timeframe_gaps=true)
+
+i_ = input(title='MACD', defval=true), ma = .0, mb = .0, mc =.0
+if i_
+    ma := ta.ema(close, 12) - ta.ema(close, 16), mb := ta.ema(ma, 9), mc := ma - mb
+hline(0, color=color.new(#787B86, 50))
+plot(i_ ? mc : na, style=plot.style_columns, color=(mc>=0?(mc[1]<mc?#26A69A:#B2DFDB):(mc[1]<mc?#FFCDD2:#FF5252)))
+plot(i_ ? ma : na, color=#2962FF)
+plot(i_ ? mb : na, color=#FF6D00)
