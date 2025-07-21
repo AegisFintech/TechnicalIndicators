@@ -90,3 +90,65 @@ plot(input.bool(false, title="VWAP Period") ? math.sum((high+low+close)/3*volume
 
 // n = Volume
 plot(input.bool(false, title='Volume') ? volume : na, style=plot.style_columns, color=open > close ? #b03838 : #008060)
+
+// o - Liqudity Swing
+o4 = bar_index
+O0(_a, _b, _c)=>
+    var _e = 0, var _d = 0.
+    if _a > 0
+        _e := 0, _d := 0.
+    else
+        _d += low[14] < _b and high[14] > _c ? volume[14] : 0, _e += low[14] < _b and high[14] > _c ? 1 : 0
+    [_e, _d]
+O1(_g, _a, _b, _c, _d, _e)=>
+    var label _f = na
+    if ta.crossover(_g, 0)
+        _f := label.new(_b, _c, str.tostring(_a, format.volume), style=_e, size=size.tiny, color=#00000000, textcolor=_d)
+    if _g > 0
+        label.set_text(_f, str.tostring(_a, format.volume))
+O2(_a, _b, _c, _d, _e)=>
+    var line _f = na
+    if _a > 0
+        if _d[1] < 0
+            line.delete(_f[1])
+        else if not _b[1]
+            line.set_x2(_f, o4 - 14)
+        _f := line.new(o4 - 14, _c, o4, _c, color = na)
+    if not _b[1]
+        line.set_x2(_f, o4+3)
+    if _b and not _b[1]
+        line.set_x2(_f, o4), line.set_style(_f, line.style_dashed)
+    if _d > 0
+        line.set_color(_f, _e)
+O3(_a, _b, _c, _d, _e)=>
+    var box bx = na
+    if ta.crossover(_d, 0)
+        bx := box.new(_a, _b, _a + _d, _c, border_color = na, bgcolor = _e)
+    if _d > 0
+        box.set_right(bx, _a + _d)
+if input.bool(false, title="Liqudity Swing")
+    o0 = input(#ff0000, '', inline = 'top'), o1 = input(color.new(#ff0000, 50), 'Area', inline = 'top')
+    o2 = input(#00897b, '', inline = 'btm'), o3  = input(color.new(#00897b, 50), 'Area', inline = 'btm')
+    [h, l, v] = request.security_lower_tf(syminfo.tickerid, '1', [high, low, volume])
+    var float o5 = na, var float o6 = na, var float o7 = na, var float o8 = na, var bool o9 = false, var bool oa = false
+    var ob = 0, var oc = 0, of = ta.pivothigh(14, 14), [og, oh] = O0(of, o5, o6)
+    var box oe = box.new(na,na,na,na, bgcolor=color.new(o1, 80)), var box pl_bx = box.new(na,na,na,na, bgcolor=color.new(o3, 80))
+    if of > 0
+        o5 := high[14], o6 := math.max(close[14], open[14]), ob := o4 - 14, o9 := false
+        box.set_lefttop(oe, ob, o5), box.set_rightbottom(oe, ob, o6)
+    else
+        o9 := close > o5 ? true : o9
+        if o9
+            box.set_right(oe, ob)
+        else
+            box.set_right(oe, o4+3)
+    O3(ob, o5, o6, og, o1), O2(of, o9, o5, og, o0), O1(og, oh, ob, o5, o0, label.style_label_down), pl = ta.pivotlow(14, 14), [pl_count, pl_vol] = O0(pl, o7, o8)
+    if pl > 0
+        o7 := math.min(close[14], open[14]), o8 := low[14], oc := o4 - 14, oa := false, box.set_lefttop(pl_bx, oc, o7), box.set_rightbottom(pl_bx, oc, o8)
+    else
+        oa := close < o8 ? true : oa
+        if oa
+            box.set_right(pl_bx, oc)
+        else
+            box.set_right(pl_bx, o4+3)
+    O3(oc, o7, o8, pl_count, o3), O2(pl, oa, o8, pl_count, o2), O1(pl_count, pl_vol, oc, o8, o2, label.style_label_up)
