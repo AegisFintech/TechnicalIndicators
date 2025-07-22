@@ -1,5 +1,5 @@
 //@version=6
-indicator(title="Main Chart [AC]", shorttitle = 'MC', overlay = true, max_bars_back = 5000, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
+indicator(title="Main Chart [AC]", shorttitle = '1', overlay = true, max_bars_back = 5000, max_lines_count = 500, max_labels_count = 500, max_boxes_count = 500)
 
 // a - EMA
 a = input.bool(true, title='EMA')
@@ -126,13 +126,10 @@ O3(_a, _b, _c, _d, _e)=>
         bx := box.new(_a, _b, _a + _d, _c, border_color = na, bgcolor = _e)
     if _d > 0
         box.set_right(bx, _a + _d)
-if input.bool(false, title="Liqudity Swing")
-    o0 = input(#ff0000, '', inline = 'top'), o1 = input(color.new(#ff0000, 50), 'Area', inline = 'top')
-    o2 = input(#00897b, '', inline = 'btm'), o3  = input(color.new(#00897b, 50), 'Area', inline = 'btm')
-    [h, l, v] = request.security_lower_tf(syminfo.tickerid, '1', [high, low, volume])
+if input.bool(true, title="Liqudity Swing")
     var float o5 = na, var float o6 = na, var float o7 = na, var float o8 = na, var bool o9 = false, var bool oa = false
     var ob = 0, var oc = 0, of = ta.pivothigh(14, 14), [og, oh] = O0(of, o5, o6)
-    var box oe = box.new(na,na,na,na, bgcolor=color.new(o1, 80)), var box pl_bx = box.new(na,na,na,na, bgcolor=color.new(o3, 80))
+    var box oe = box.new(na,na,na,na, bgcolor=color.new(#ff0000, 80)), var box ol = box.new(na,na,na,na, bgcolor=color.new(#00897b, 80))
     if of > 0
         o5 := high[14], o6 := math.max(close[14], open[14]), ob := o4 - 14, o9 := false
         box.set_lefttop(oe, ob, o5), box.set_rightbottom(oe, ob, o6)
@@ -142,13 +139,68 @@ if input.bool(false, title="Liqudity Swing")
             box.set_right(oe, ob)
         else
             box.set_right(oe, o4+3)
-    O3(ob, o5, o6, og, o1), O2(of, o9, o5, og, o0), O1(og, oh, ob, o5, o0, label.style_label_down), pl = ta.pivotlow(14, 14), [pl_count, pl_vol] = O0(pl, o7, o8)
-    if pl > 0
-        o7 := math.min(close[14], open[14]), o8 := low[14], oc := o4 - 14, oa := false, box.set_lefttop(pl_bx, oc, o7), box.set_rightbottom(pl_bx, oc, o8)
+    O3(ob, o5, o6, og, #ff0000), O2(of, o9, o5, og, #ff0000), O1(og, oh, ob, o5, #ff0000, label.style_label_down), oi = ta.pivotlow(14, 14), [oj, ok] = O0(oi, o7, o8)
+    if oi > 0
+        o7 := math.min(close[14], open[14]), o8 := low[14], oc := o4 - 14, oa := false, box.set_lefttop(ol, oc, o7), box.set_rightbottom(ol, oc, o8)
     else
         oa := close < o8 ? true : oa
         if oa
-            box.set_right(pl_bx, oc)
+            box.set_right(ol, oc)
         else
-            box.set_right(pl_bx, o4+3)
-    O3(oc, o7, o8, pl_count, o3), O2(pl, oa, o8, pl_count, o2), O1(pl_count, pl_vol, oc, o8, o2, label.style_label_up)
+            box.set_right(ol, o4+3)
+    O3(oc, o7, o8, oj, #00897b), O2(oi, oa, o8, oj, #00897b), O1(oj, ok, oc, o8, #00897b, label.style_label_up)
+
+// p - Money Flow Profile
+type bar
+    float o = open
+    float h = high
+    float l = low
+    float c = close
+    float v = volume
+    int i = bar_index
+p0 = last_bar_index > 200 ? 199 : last_bar_index, bar p1 = bar.new(), p2 = array.new_float(25, 0.), p3 = array.new_float(25, 0.), p4 = array.new_float(25, 0.)
+var p5 = array.new_box(), var p6 = array.new<chart.point>(), var color p7 = na, var color p8 = na, p9 = p1.c > p1.o, pa  = nz(p1.v), var float pb = na, var float pc = na
+if p1.i == last_bar_index - p0
+    pb := p1.l, pc := p1.h
+else if p1.i > last_bar_index - p0
+    pb := math.min(p1.l, pb), pc := math.max(p1.h, pc)
+pd = (pc - pb) / 25
+if input.bool(false, title="Money Flow Profile") and barstate.islast and not na(pa) and not timeframe.isseconds and p0 > 0 and pd > 0 and pa > 0
+    if p5.size() > 0
+        for i = 0 to p5.size() - 1
+            box.delete(p5.shift())
+    if p6.size() > 0
+        p6.clear()
+    for j = p0 to 0
+        i = 0
+        for k = pb to pc - pd by pd
+            if (p1[j]).h >= k and (p1[j]).l < k + pd
+                vPOR = if (p1[j]).l >= k and (p1[j]).h > k + pd
+                    (k + pd - (p1[j]).l) / ((p1[j]).h - (p1[j]).l)
+                else if (p1[j]).h <= k + pd and (p1[j]).l < k
+                    ((p1[j]).h - k) / ((p1[j]).h - (p1[j]).l)
+                else if ((p1[j]).l >= k and (p1[j]).h <= k + pd)
+                    1
+                else
+                    pd / ((p1[j]).h - (p1[j]).l)
+                p2.set(i, p2.get(i) + pa[j] * vPOR )
+                if p9[j]
+                    p3.set(i, p3.get(i) + pa[j] * vPOR )
+            i += 1
+        p6.push(chart.point.from_index((p1[j]).i, pb + (p2.indexof(p2.max()) + .5) * pd))
+    for i = 0 to 25 - 1
+        _e = 2*p3.get(i)-p2.get(i), p4.set(i, p4.get(i)+_e*(_e>0?1:-1) ), _f=p1.i+p0*13/100+int(p0*13/100/3), p5.push(box.new(_f-1+13,pb+(i+.1)*pd, _f-int(p0*13/100/3)+14, 
+         pb+(i+.9)*pd,#2962ff80,bgcolor=#2962ff10,text=str.tostring(pb+(i+.5)*pd,format.mintick),text_color=chart.fg_color,text_size=size.auto))
+    for i = 0 to 25 - 1
+        if p5.size() < 500
+            _a=p2.get(i), _b=p2.max(), _c =_a/_b, _d=p4.get(i)/p4.max()
+            p7 := _c>53/100?color.from_gradient(_c,53/100,1,color.new(#2962ff,50),color.new(#ffeb3b,50)):color.from_gradient(_c,0,37/100,color.new(#f23645,50),color.new(#2962ff,50))
+            _e = 2*p3.get(i)-_a
+            p8 := _e>0?color.from_gradient(_d,0,.7,color.new(color.new(#26a69a,50),70+int(73/4)),color.new(color.new(#26a69a,50),30+int(73/4))) : 
+             color.from_gradient(_d,0,.7,color.new(color.new(#ef5350,50),70+int(73/4)),color.new(color.new(#ef5350,50),30+int(73/4)))
+            if _c == 1
+                p5.push(box.new((p1[p0]).i,pb+(p2.indexof(_b)+.0)*pd,p1.i,pb+(p2.indexof(_b)+1.)*pd,color.new(#ffeb3b,50),bgcolor=color.new(color.new(#ffeb3b,50),73)))
+            _f = p1.i+p0*13/100+int(p0*13/100/3), p5.push(box.new(_f+13,pb+(i+.1)*pd,_f+int(_c*p0*13/100)+13,pb+(i+.9)*pd,p7,bgcolor=p7, 
+             text=str.tostring(array.get(p2,i)*(pb+(i+.5)*pd),format.volume)+' ('+str.tostring(math.abs(_a/p2.sum()*100),'#.##')+'%)',text_halign=text.align_left,text_color=chart.fg_color,text_size=size.auto))
+            _f := p1.i+p0*13/100, p5.push(box.new(_f+13,pb+(i+.1)*pd,_f-int(_d*p0*13/100)+13,pb+(i+.9)*pd,p8,bgcolor=p8,
+             text=str.tostring(_e,format.volume)+' ('+str.tostring(math.abs(_e/_a*100),'#.##')+'%)',text_halign=text.align_right,text_color=chart.fg_color,text_size=size.auto))
