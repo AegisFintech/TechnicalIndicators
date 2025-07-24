@@ -204,3 +204,186 @@ if input.bool(false, title="Money Flow Profile") and barstate.islast and not na(
              text=str.tostring(array.get(p2,i)*(pb+(i+.5)*pd),format.volume)+' ('+str.tostring(math.abs(_a/p2.sum()*100),'#.##')+'%)',text_halign=text.align_left,text_color=chart.fg_color,text_size=size.auto))
             _f := p1.i+p0*13/100, p5.push(box.new(_f+13,pb+(i+.1)*pd,_f-int(_d*p0*13/100)+13,pb+(i+.9)*pd,p8,bgcolor=p8,
              text=str.tostring(_e,format.volume)+' ('+str.tostring(math.abs(_e/_a*100),'#.##')+'%)',text_halign=text.align_right,text_color=chart.fg_color,text_size=size.auto))
+
+// q - Breaker Blocks
+q0=last_bar_index-bar_index<=2000, q1=math.max(close,open), q2=math.min(close,open), q3=bar_index, q4=high, q5=low
+type Q0 
+    int[] d
+    int[] x 
+    float[] y
+    bool[] b
+type Q1 
+    int a
+type Q2
+    int a
+    bool b
+    bool c
+    box d
+    box e
+    line f
+    line g
+    line h
+    bool i
+    bool j
+    box k
+    line l
+    label m
+    box n
+    line o    
+    label p
+    bool q
+    bool r
+    bool s
+    label t
+    label[] u
+var Q0 q6 = Q0.new(array.new<int>(50,0), array.new<int>(50,0), array.new<float>(50,na), array.new<bool>(50,false)), var Q1 q8 = Q1.new(0)
+var Q2 q7=Q2.new(d=box.new(na,na,na,na,border_color=na), e=box.new(na,na,na,na,border_color=na,text_size=size.small,text_halign=text.align_right)
+ , f=line.new(na,na,na,na,style=line.style_dashed,color=#b2b5be), l=line.new(na,na,na,na,color=#b2b5be), m=label.new(na,na,color=na)
+ , n=box.new(na,na,na,na,border_color=na), o=line.new(na,na,na,na,color=#b2b5be), p=label.new(na,na,color=na), g=line.new(na,na,na,na,color=#b2b5be)
+ , h=line.new(na,na,na,na,color=#b2b5be), t=label.new(na,na,color=na,textcolor=#b2b5be,yloc=yloc.price), u=array.new<label>(1,label(na)))
+method Q3(Q0 a, int b, int c, float d, bool e) => a.d.unshift(b), a.x.unshift(c), a.y.unshift(d), a.b.unshift(e), a.d.pop(), a.x.pop(), a.y.pop(), a.b.pop()
+method Q4(color a) => color.rgb(color.r(a), color.g(a), color.b(a))
+Q5(string a, float b, color c, string d, string e = size.small) =>      
+    label.new(q3, b, style=a == 'c' ? label.style_label_center : a == 'u' ? label.style_label_up : label.style_label_down, textcolor=c, color=na, size=e, text=d)
+if input.bool(true, title="Breaker Blocks")
+    max_bars_back(time, 1000), var float q9=na, var float qa=na, var int qb=q6.d.size(), qc=bar_index-1, qd=ta.pivothigh(q4,5,1), qe=ta.pivotlow(q5,5,1)
+    if qd > 0   
+        i=q6.d.get(0), q9:=q6.y.get(0), qa:=nz(q4[1])
+        if i < 1 
+            q6.Q3(1, qc, qa, true)
+        else
+            if i ==  1 and qd > q9 
+                q6.x.set(0, qc), q6.y.set(0, qa)     
+    if qe > 0 
+        i=q6.d.get(0), q9:=q6.y.get(0), qa:=nz(q5[1])
+        if i > -1
+            q6.Q3(-1, qc, qa, true)
+        else
+            if i == -1 and qe < q9 
+                q6.x.set(0, qc), q6.y.set(0, qa)
+    qf = q6.d.get(2) == 1 ? 2 : 1, qg = q6.d.get(2) == -1 ? 2 : 1
+    switch
+        close > q6.y.get(qf) and q6.d.get(qf) == 1 and q8.a < 1 and q0 =>
+            qh=q6.x.get(qf-1), qi=q6.y.get(qf-1), qj=q6.x.get(qf), qk=q6.x.get(qf+1), ql=q6.y.get(qf+1)
+            if qi < ql and qk != qj 
+                for i = q3 - qj to q3 - qk
+                    if close[i] > open[i]
+                        q7.k.set_lefttop(na,na),q7.l.set_xy1(na,na),q7.m.set_xy(na,na), q7.n.set_lefttop(na,na),q7.o.set_xy1(na,na),q7.p.set_xy(na,na)
+                        while q7.u.size() > 0
+                            q7.u.pop().delete()
+                        q7.a:=1, q7.d.set_left(q3-i), q7.d.set_top(q1[i]), q7.d.set_right(q3), q7.d.set_bottom(q2[i]), q7.d.set_bgcolor(#0cb51a12)
+                        q7.e.set_left(q3), q7.e.set_top(q1[i]), q7.e.set_right(q3+8), q7.e.set_bottom(q2[i]), q7.e.set_bgcolor(#0cb51a26)
+                        q7.e.set_text('+BB'), q7.e.set_text_color(#0cb51a26.Q4()), q7.e.set_text_valign(text.align_bottom), _0=math.avg(q2[i], q1[i])
+                        q7.f.set_xy1(q3,_0), q7.f.set_xy2(q3,_0), q7.g.set_xy1(qk, ql), q7.g.set_xy2(q3,ql), q7.h.set_xy1(qh,qi), q7.h.set_xy2(q3,qi)
+                        q7.i:=false, q7.j:=false, q7.t.set_xy(qh, qi), q7.t.set_style(label.style_label_up), q7.t.set_text('LL')
+                        q7.b:=false, q7.c:=false, q7.s:=false, q7.q:=false, q7.r:=false, _1=0, _2=high
+                        for c = 0 to qb -2
+                            _3=q6.x.get(c), _4=q6.y.get(c)
+                            if _4>_2 and q6.d.get(c)==1
+                                _5=(high[q3-_3]-q2[q3-_3])/4
+                                switch _1
+                                    0 =>
+                                        q7.k.set_lefttop(_3,_4), q7.l.set_xy1(_3,_4), q7.k.set_rightbottom(q3,_4-_5), q7.l.set_xy2(q3,_4)
+                                        q7.k.set_bgcolor(#0cb51a26), q7.m.set_xy(_3,_4), q7.m.set_size(size.small), q7.m.set_textcolor(#b2b5be)
+                                        q7.m.set_text('Premium PDA'), q7.m.set_style(label.style_label_lower_left), _1:=1, _2:=_4
+                                    1 =>
+                                        if _4-_5>_2
+                                            q7.n.set_lefttop(_3,_4), q7.o.set_xy1(_3,_4), q7.n.set_rightbottom(q3,_4-_5), q7.o.set_xy2(q3,_4)
+                                            q7.n.set_bgcolor(#0cb51a26), q7.p.set_xy(_3,_4), q7.p.set_size(size.small), q7.p.set_textcolor(#b2b5be)
+                                            q7.p.set_text('Premium PDA'), q7.p.set_style(label.style_label_lower_left), _1:=2
+                            if _1 == 2
+                                break
+                        q7.u.unshift(Q5('u', low, #0cb51a26.Q4(), '▲', size.large)), break
+            q8.a :=  1
+        close < q6.y.get(qg) and q6.d.get(qg) == -1 and q8.a > -1 and q0 =>
+            qh=q6.x.get(qg-1), qi=q6.y.get(qg-1), qj=q6.x.get(qg), qk=q6.x.get(qg+1), ql=q6.y.get(qg+1)
+            if qi > ql and qk != qj
+                for i = q3 - qj to q3 - qk
+                    if close[i] < open[i]
+                        q7.k.set_lefttop(na,na),q7.l.set_xy1(na,na),q7.m.set_xy(na,na), q7.n.set_lefttop(na,na),q7.o.set_xy1(na,na),q7.p.set_xy(na,na)
+                        while q7.u.size() > 0
+                            q7.u.pop().delete()
+                        q7.a:=-1, q7.d.set_left(q3-i), q7.d.set_top(q1[i]), q7.d.set_right(q3), q7.d.set_bottom(q2[i]), q7.d.set_bgcolor(#ff11000d)
+                        q7.e.set_left(q3), q7.e.set_top(q1[i]), q7.e.set_right(q3+8), q7.e.set_bottom(q2[i]), q7.e.set_bgcolor(#ff110026)
+                        q7.e.set_text('-BB'), q7.e.set_text_color(#ff110026.Q4()), q7.e.set_text_valign(text.align_top), _0=math.avg(q2[i],q1[i])
+                        q7.f.set_xy1(q3,_0), q7.f.set_xy2(q3,_0), q7.g.set_xy1(qk,ql), q7.g.set_xy2(q3,ql), q7.h.set_xy1(qh, qi), q7.h.set_xy2(q3,qi)
+                        q7.j:=false, q7.t.set_xy(qh, qi), q7.t.set_style(label.style_label_down), q7.t.set_text('HH'), q7.t.set_textcolor(#b2b5be)   
+                        q7.i:=false, q7.b:=false, q7.c:=false, q7.s:=false, q7.q:=false, q7.r:=false, _1=0, _2=low
+                        for c = 0 to qb -2
+                            _3=q6.x.get(c), _4=q6.y.get(c)
+                            if _4<_2 and q6.d.get(c)==-1
+                                _5=(q1[q3-_3]-low[q3-_3])/4
+                                switch _1 
+                                    0 =>
+                                        q7.k.set_lefttop(_3,_4+_5), q7.l.set_xy1(_3,_4), q7.k.set_rightbottom(q3,_4), q7.l.set_xy2(q3,_4)
+                                        q7.k.set_bgcolor(#00897b26), q7.m.set_xy(_3,_4), q7.m.set_size(size.small), q7.m.set_textcolor(#b2b5be)
+                                        q7.m.set_text('Discount PDA'), q7.m.set_style(label.style_label_upper_left), _1:=1, _2:=_4
+                                    1 => 
+                                        if _4 + _5 < _2
+                                            q7.n.set_lefttop(_3,_4+_5), q7.o.set_xy1(_3,_4), q7.n.set_rightbottom(q3,_4), q7.o.set_xy2(q3,_4)
+                                            q7.n.set_bgcolor(#00897b26), q7.p.set_xy(_3,_4), q7.p.set_size(size.small), q7.p.set_textcolor(#b2b5be)
+                                            q7.p.set_text('Discount PDA'), q7.p.set_style(label.style_label_upper_left), _1:=2
+                            if _1 == 2
+                                break                    
+                        q7.u.unshift(Q5('d', high, #ff110026.Q4(), '▼', size.large)), break       
+            q8.a := -1 
+    qm=q7.e.get_top(), qn=q7.e.get_bottom(), qo=q7.f.get_y2(), qp=q7.g.get_y2(), qq=q7.h.get_y2()
+    switch q7.a
+        1  => 
+            if not q7.c
+                if close < qn
+                    q7.c:=true, q7.u.unshift(Q5('u',low,#ffeb3b,'●')), q7.e.set_right(q3), q7.f.set_x2(q3)
+                else
+                    q7.e.set_right(q3+8), q7.f.set_x2(q3+8)
+                if q3 > q7.e.get_left()
+                    if not q7.b
+                        switch
+                            open > qo and open < qm and close > qm => 
+                                q7.s:=true, q7.u.unshift(Q5('u',low,#00e676,'▲',size.normal))
+                            close < qo and close > qn => 
+                                q7.b:=true, q7.s:=false, q7.u.unshift(Q5('u',low,#ff9800,'❌'))
+            if not q7.i
+                q7.g.set_x2(q3)
+                if close < qp
+                    q7.i := true                     
+            if not q7.j 
+                q7.h.set_x2(q3)
+                if close < qq
+                    q7.j := true                    
+            if not q7.q
+                q7.k.set_right(q3), q7.l.set_x2(q3)
+                if close > q7.k.get_top() and q3 > q7.k.get_left()
+                    q7.q := true
+            if not q7.r
+                q7.n.set_right(q3), q7.o.set_x2(q3)
+                if close > q7.n.get_top() and q3 > q7.n.get_left()
+                    q7.r := true
+        -1 =>
+            if not q7.c
+                if close > qm
+                    q7.c:=true, q7.e.set_right(q3), q7.f.set_x2(q3)
+                else
+                    q7.e.set_right(q3+8), q7.f.set_x2(q3+8)
+                if q3 > q7.e.get_left()
+                    if not q7.b
+                        switch
+                            open < qo and open > qn and close < qn => 
+                                q7.s:=true, q7.u.unshift(Q5('d',high,#ff9800,'▼',size.normal))
+                            close > qo and close < qm => 
+                                q7.b:=true, q7.s:=false, q7.u.unshift(Q5('d',high,#ff5252,'❌'))
+            if not q7.i             
+                q7.g.set_x2(q3)
+                if close > qp                 
+                    q7.i := true
+            if not q7.j             
+                q7.h.set_x2(q3)
+                if close > qq
+                    q7.j := true
+            if not q7.q
+                q7.k.set_right(q3), q7.l.set_x2(q3)
+                if close < q7.k.get_bottom() and q3 > q7.k.get_left()
+                    q7.q := true
+            if not q7.r
+                q7.n.set_right(q3), q7.o.set_x2(q3)
+                if close < q7.n.get_bottom() and q3 > q7.n.get_left()
+                    q7.r := true
