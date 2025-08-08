@@ -1,5 +1,5 @@
 //@version=6
-indicator(title="Main Chart [AC]", shorttitle='1', overlay=true, max_bars_back=5000, max_lines_count=500, max_labels_count=500, max_boxes_count=500)
+indicator(title="Super All-in-One [AC]", shorttitle='Super', overlay=true, max_bars_back=5000, max_lines_count=500, max_labels_count=500, max_boxes_count=500)
 
 // a - EMA
 a=input.bool(true,title='EMA'), plot(a?ta.ema(close,21):na,color=#ff0000), plot(a?ta.ema(close,50):na,color=#ffff00), plot(a?ta.ema(close,200):na,color=#ffffff)
@@ -501,3 +501,103 @@ if input.bool(true, title="Harmonics")
                 if not na(re)
                     if rd
                         draw.eHitLbl(re.e.x,re.e.y,re.d.x,re.d.y,rc.bull,true)
+
+// s - Candle
+s0=ta.sma(close,200), s1=ta.sma(close,50), s2=close<s1 and s1<s0, s3=close>s1 and s1>s0, s4=math.max(close,open), s5=math.min(close,open), s6=s4-s5, s7=ta.ema(s6,14), s8=s6<s7, s9=s6>s7, sa=high-s4, sb=s5-low, sc=sa>.05*s6, sd=sb>.05*s6, se=open<close
+sf=open>close, sg=high-low, sh=s6/2+s5, si=sg>0 and s6<=sg*.05, sj=si and(sa==sb or(math.abs(sa-sb)/sb*100)<100 and(math.abs(sb-sa)/sa*100)<100), sk=low-(ta.atr(30)*0.6), sl=high+(ta.atr(30)*0.6), sn=sg*.05>sa, so=sg*.05>sb, sp=s9 and sa<=.05*s6 and sb<=.05*s6
+S0(_a, _b)=>label.new(bar_index, sl, text=_a, style=label.style_label_down, color=#ff5252, tooltip=_b)
+S1(_a, _b)=>label.new(bar_index, sk, text=_a, style=label.style_label_up, color=#2196f3, tooltip=_b)
+if input.bool(true, title="Candle")
+    if s2 and sf[1] and s9[1] and se and open < close[1] and s8 and sg!=0 and math.abs(close-low[1])<=s7*.05
+        S0("ON", "On Neck")
+    if s3[1] and (sg!=0 and sg[1]!=0) and low > high[1]
+        S1("RW", "Rising Window")
+    if s2[1] and (sg!=0 and sg[1]!=0) and high < low[1]
+        S0("FW", "Falling Window")
+    if s2[4] and (s9[4] and sf[4]) and (s8[3] and se[3] and open[3]>low[4] and close[3]<high[4]) and (s8[2] and se[2] and open[2]>low[4] and close[2]<high[4]) and (s8[1] and se[1] and open[1]>low[4] and close[1]<high[4]) and (s9 and sf and close<close[4])
+        S0("F3", "Falling 3 Methods")
+    if s3[4] and (s9[4] and se[4]) and (s8[3] and sf[3] and open[3]<high[4] and close[3]>low[4]) and (s8[2] and sf[2] and open[2]<high[4] and close[2]>low[4]) and (s8[1] and sf[1] and open[1]<high[4] and close[1]>low[4]) and (s9 and se and close>close[4])
+        label.new(bar_index, sk, text="R3", style=label.style_label_up, color = #2196f3, tooltip = "Rising Three Methods")
+        S1("R3", "Rising Window")
+    if s3[1] and (not si or (sc and sd)) and math.abs(high-high[1]) <= s7*.05 and se[1] and sf and s9[1]
+        S0("TT", "Tweezer Top")
+    if s2[1] and (not si or (sc and sd)) and math.abs(low-low[1]) <= s7*.05 and sf[1] and se and s9[1]
+        S1("TB", "Tweexer Bottom")
+    if (s3[1] and se[1] and s9[1]) and (sf and open >= high[1] and  close < sh[1] and close > open[1])
+        S0("DC", "Dark Cloud Cover")
+    if s9[2] and s8[1] and s2 and sf[2] and s4[1] < s5[2] and sf[1] and se and s4 <= s5[2] and s4 >= s4[1]
+        S0("TG", "Tasuji Gap")
+    if s9[2] and s8[1] and s3 and se[2] and s5[1] > s4[2] and se[1] and sf and s5 >= s4[2] and s5 <= s5[1]
+        S1("TG", "Tasuki Gap")
+    if s9[2] and si[1] and s9 and s3 and se[2] and s5[1] > s4[2] and sf and s5 <= sh[2] and s5 > s5[2] and s5[1] > s4
+        S0("DS", "Evening Doji Star")
+    if s3 and se[1] and s9[1] and si and s5 > s4[1]
+        S0("DS", "Doji Star")
+    if s2 and sf[1] and s9[1] and si and s4 < s5[1]
+        S1("DS", "Doji Star")
+    if s9[2] and si[1] and s9 and s2 and sf[2] and s4[1] < s5[2] and se and s4 >= sh[2] and s4 < s4[2] and s4[1] < s5
+        S1("DS", "Morning Doji Star")
+    if (s2[1] and sf[1] and s9[1]) and (se and open <= low[1] and close > sh[1] and close < open[1])
+        S1("PR", "Piercing")
+    if (s8 and s6 > 0 and s5 > hl2 and sb >= 2 * s6 and not sc) and s2
+        S1("HA", "Hammer")
+    if (s8 and s6 > 0 and s5 > hl2 and sb >= 2 * s6 and not sc) and s3
+        S0("HM", "Hanging Man")
+    if (s8 and s6 > 0 and s4 < hl2 and sa >= 2 * s6 and not sd) and s3
+        S0("SS", "Shooting Star")
+    if (s8 and s6 > 0 and s4 < hl2 and sa >= 2 * s6 and not sd) and s2
+        S1("IH", "Inverted Hammer")
+    if s9[2] and s8[1] and s9
+        if s2 and sf[2] and s4[1] < s5[2] and se and s4 >= sh[2] and s4 < s4[2] and s4[1] < s5
+            S1("MS", "Morning Star")
+        else if s3 and se[2] and s5[1] > s4[2] and sf and s5 <= sh[2] and s5 > s5[2] and s5[1] > s4
+            S0("ES", "Evening Star")
+    if s9 and sa <= .05*s6 and sb <= .05*s6
+        if se
+            S1("MW", "Marubozu White")
+        else if sf
+            S0("MW", "Marubozu Black")
+    if sj and not (si and sa <= s6) and not (si and sb <= s6) 
+        S1("DJ", "Doji")
+    if si and sb <= s6
+        S0("GD", "Gravestone Doji")
+    if si and sa <= s6
+        S1("DD", "Dragofly Doji")
+    if s9[1] and sf[1] and s2[1] and si and high <= s4[1] and low >= s5[1]
+        S1("HC", "Harami Cross")
+    if s9[1] and se[1] and s3[1] and si and high <= s4[1] and low >= s5[1]
+        S0("HC", "Harami Cross")
+    if s9[1] and sf[1] and s2[1] and se and s8 and high <= s4[1] and low >= s5[1]
+        S1("HA", "Harami")
+    if s9[1] and se[1] and s3[1] and sf and s8 and high <= s4[1] and low >= s5[1]
+        S0("HA", "Harami")
+    if sb > sg/100*75
+        S1("LS", "Long Lower Shadow")
+    if sa > sg/100*75
+        S0("US", "Long Upper Shadow")
+    if sb >= sg / 100 * 34 and sa >= sg / 100 * 34 and not si
+        if se
+            S1("ST", "Spinning Top White")
+        else if sf
+            S1("ST", "Spinning Top Black")
+    if(s9 and s9[1]and s9[2])
+        if (se and se[1]and se[2])and(close>close[1]and close[1]>close[2]and open<close[1]and open>open[1]and open[1]<close[2]and open[1]>open[2]and sn and sn[1]and sn[2])
+            S1("3W", "3 White Soldiers")
+        else if (sf and sf[1]and sf[2])and(close<close[1]and close[1]<close[2]and open>close[1]and open<open[1]and open[1]>close[2]and open[1]<open[2]and so and so[1]and so[2])
+            S0("3W", "3 Black Crows")
+    if s2 and se and s9 and sf[1] and s8[1] and close >= open[1] and open <= close[1] and ( close > open[1] or open < close[1])
+        S1("EN", "Bullish Engulfing")
+    if s3 and sf and s9 and se[1] and s8[1] and close <= open[1] and open >= close[1] and ( close < open[1] or open > close[1])
+        S0("EN", "Bearish Engulfing")
+    if s2[2] and sf[2] and si[1] and low[2] > high[1] and se and high[1] < low
+        S1("AB", "Abandoned Baby")
+    if s3[2] and se[2] and si[1] and high[2] < low[1] and sf and low[1] > high
+        S0("AB", "Abandoned Baby")
+    if (sj[2] and sj[1] and sj) and s2[2] and (s4[1] < s5)[1] and s5[1] > s4
+        S1("TS", "Tri-Star")
+    if (sj[2] and sj[1] and sj) and s3[2] and (s4[1] < s5)[1] and s5[1] > s4
+        S0("TS", "Tri-Star")
+    if (sp and sf)[1] and sp and se and high[1] < low
+        S1("KI", "Kicking")
+    if (sp and se)[1] and sp and sf and low[1] > high
+        S0("KI", "Kicking")
