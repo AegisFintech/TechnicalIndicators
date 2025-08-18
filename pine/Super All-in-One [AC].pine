@@ -601,3 +601,140 @@ if input.bool(true, title="Candle")
         S1("KI", "Kicking")
     if (sp and se)[1] and sp and sf and low[1] > high
         S0("KI", "Kicking")
+
+// t - Elliott Wave
+type t0 
+    int[] d
+    int[] x 
+    float[] y 
+    line[] l
+type t1
+    line a
+    line b
+    line c  
+    line d
+    line e
+    label f
+    label g
+    label h
+    label b4
+    label i
+    bool j
+    bool k
+    int l
+    line m
+    line n
+    line lC
+    label p
+    label q
+    label r
+    bool s=false
+    label t
+    box u
+type t2
+    line a 
+    line b 
+    line c 
+    line d 
+    line e 
+    linefill f 
+    bool g
+T0(_a,_b,_c,_d) => _a.d.unshift(_b), _a.x.unshift(_c), _a.y.unshift(_d), _a.d.pop(), _a.x.pop(), _a.y.pop()
+method T1(t1 _a,_b,_c,_d,_e) => _b==_a.a.get_x1()and _c==_a.b.get_x1()and _d==_a.c.get_x1()and _e==_a.d.get_x1()
+method T2(t1 _a,_b,_c,_d) => _b ==_a.c.get_x2() and _c ==_a.d.get_x2() and _d ==_a.e.get_x2() 
+method T3(t1 _a) => _a.a.set_style(line.style_dotted), _a.b.set_style(line.style_dotted), _a.c.set_style(line.style_dotted), _a.d.set_style(line.style_dotted), _a.e.set_style(line.style_dotted), _a.f.set_textcolor(color(na)), _a.g.set_textcolor(color(na)), _a.h.set_textcolor(color(na)), _a.b4.set_textcolor(color(na)), _a.i.set_textcolor(color(na)), _a.j:=false
+method T4(t1 _a) => _a.m.set_style(line.style_dashed), _a.n.set_style(line.style_dashed), _a.lC.set_style(line.style_dashed), _a.p.set_textcolor(color(na)), _a.q.set_textcolor(color(na)), _a.r.set_textcolor(color(na)), _a.u.set_bgcolor(color(na)), _a.u.set_border_color(color(na))
+method T5(t2 _a,_b,_c) => style=_b, _a.a.set_style(style), _a.b.set_style(style), _a.c.set_style(style), _a.d.set_style(style), _a.f.set_color(_c)
+draw(left, col, n) =>
+    max_bars_back(time, 2000), var int _d=na, var float _e=na, var int _f=na, var float _g=na, var t1 _h=na, var float _i=na, var int _j=na, var float _k=na, var t2 t3=t2.new(a=line.new(na,na,na,na,color=color.new(col,50),style=line.style_solid),b=line.new(na,na,na,na,color=color.new(col,38),style=line.style_solid), c=line.new(na,na,na,na,color=color.new(col,24),style=line.style_solid), d=line.new(na,na,na,na,color=color.new(col,15),style=line.style_solid), e=line.new(na,na,na,na,color=color.new(col,50),style=line.style_dashed), f=linefill.new(line.new(na,na,na,na,color=color(na)),line.new(na,na,na,na,color=color(na)),color=color(na)), g=false), var t0 t4=t0.new(array.new< int>(),array.new< int>(),array.new< float>(),array.new<line>()), var t1[] t5=array.new<t1>(), if barstate.isfirst
+        t5.unshift(t1.new()), for i=0 to 10
+            t4.d.unshift(0), t4.x.unshift(0), t4.y.unshift(0), t4.l.unshift(na)
+    _f:=bar_index-1, ph=ta.pivothigh(high,left,1), pl=ta.pivotlow (low,left,1), t=n==2?'\n\n':n==1?'\n':'', if not na(ph) 
+        _h:=t5.get(0), _d:=t4.d.get (0), _e:=t4.y.get (0), _g:=nz(high[1]), if _d <  1
+            T0(t4,  1, _f, _g)
+        else
+            if _d ==  1 and ph > _e  
+                t4.x.set(0, _f), t4.y.set(0, _g)
+        _l=_f, _m=_g, _n=t4.x.get(1), _o=t4.y.get(1), _p=t4.x.get(2), _q=t4.y.get(2), _r=t4.x.get(3), _s=t4.y.get(3), _t=t4.x.get(4), _u=t4.y.get(4), _v=t4.x.get(5), _w=t4.y.get(5), _x=_m-_o, _y=_q-_s, _z=_u-_w, _0=_h.T1(_v, _t, _r, _p), if _y!=math.min(_z,_y,_x) and _m>_q and _s>_w and _o>_u
+            if _0
+                _h.e.set_xy2(_l,_m), _h.i.set_xy (_l,_m)
+            else
+                tx='', if _t == t5.get(0).i.get_x() 
+                    tx:='(5) (1)', t5.get(0).i.set_text('')
+                else
+                    tx := '(1)'          
+                t5.unshift(t1.new(a=line.new(_v,_w,_t,_u,color=col,style=line.style_solid),b=line.new(_t,_u,_r,_s,color=col,style=line.style_solid),c=line.new(_r,_s,_p,_q,color=col,style=line.style_solid),d=line.new(_p,_q,_n,_o,color=col,style=line.style_solid),e=line.new(_n,_o,_l,_m,color=col,style=line.style_solid),f=label.new(_t,_u,text=tx+t,textcolor=col,color=color(na),style=label.style_label_down),g=label.new(_r,_s,text=t+'(2)',textcolor=col,color=color(na),style=label.style_label_up),h=label.new(_p,_q,text='(3)'+t,textcolor=col,color=color(na),style=label.style_label_down),b4=label.new(_n,_o,text=t+'(4)',textcolor=col,color=color(na),style=label.style_label_up),i=label.new(_l,_m,text='(5)'+t,textcolor=col,color=color(na),style=label.style_label_down),j=true,k=false,l=1)), t3.g:=false
+        else
+            if _0 and _h.j == true
+                _h.T3()                                                                                      
+        _1=t5.get(0), _i:=_1.a.get_y1(), _j:=_1.e.get_x2(), _k:=_1.e.get_y2(), _2=math.abs(_k-_i), if _1.l==-1 
+            _3=_1.e.get_y2() , T2=_1.T2(_v,_t,_r), if _r==_1.e.get_x2()and _m<_3+(_2*.854)and _q<_3+(_2*.854)and _o>_3
+                _4=_l-_t, if T2 and _1.p.get_x()>_r
+                    _1.lC.set_xy1(_n,_o), _1.lC.set_xy2(_l,_m), _1.r.set_xy(_l,_m), _1.u.set_lefttop(_l,_m), _1.u.set_right(_l+_4)
+                else
+                    _1.m:=line.new(_r,_s,_p,_q,color=col), _1.p:=label.new(_p,_q,text='(a)'+t,textcolor=col,color=color(na),style=label.style_label_down), _1.n:=line.new(_p,_q,_n,_o,color=col), _1.q:=label.new(_n,_o,text=t+'(b)',textcolor=col,color=color(na),style=label.style_label_up), _1.lC:=line.new(_n,_o,_l,_m,color=col), _1.r:=label.new(_l,_m,text='(c)'+t,textcolor=col,color=color(na),style=label.style_label_down), _1.u:=box.new(_l,_m,_l+_4,_q,bgcolor=color.new(col,93),border_color=color.new(col,65))
+            else
+                if T2 and _1.p.get_x() > _r
+                    _1.T4()
+        if _1.l==1 and _n==_1.r.get_x() and _m>_1.i.get_y() and _1.s==false
+            _1.s:=true, _1.t:=label.new(_l,_m,style=label.style_circle,color=color.new(col,65),yloc=yloc.abovebar,size=size.tiny)
+    if not na(pl) 
+        _h:=t5.get(0), _d:=t4.d.get(0), _e:=t4.y.get(0), _g:=nz(low[1]), if _d>-1
+            T0(t4, -1, _f, _g)
+        else
+            if _d == -1 and pl < _e 
+                t4.x.set(0, _f), t4.y.set(0, _g)
+        _l=_f, _m=_g, _n=t4.x.get(1), _o=t4.y.get(1), _p=t4.x.get(2), _q=t4.y.get(2), _r=t4.x.get(3), _s=t4.y.get(3), _t=t4.x.get(4), _u=t4.y.get(4), _v=t4.x.get(5), _w=t4.y.get(5), _x=_o-_m, _y=_s-_q, _z=_w-_u, _0=T1(_h,_v,_t,_r,_p), if _y!=math.min(_z,_y,_x) and _q>_m and _w>_s and _u>_o
+            if _0
+                _h.e.set_xy2(_l,_m), _h.i.set_xy (_l,_m)
+            else
+                tx='', if _t==t5.get(0).i.get_x() 
+                    tx:='(5) (1)', t5.get(0).i.set_text('')
+                else
+                    tx := '(1)'
+                t5.unshift(t1.new(a=line.new(_v,_w,_t,_u,color=col,style=line.style_solid),b=line.new(_t,_u,_r,_s,color=col,style=line.style_solid),c=line.new(_r,_s,_p,_q,color=col,style=line.style_solid),d=line.new(_p,_q,_n,_o,color=col,style=line.style_solid),e=line.new(_n,_o,_l,_m,color=col,style=line.style_solid),f=label.new(_t,_u,text=t+tx,textcolor=col,color=color(na),style=label.style_label_up),g=label.new(_r,_s,text='(2)'+t,textcolor=col,color=color(na),style=label.style_label_down),h=label.new(_p,_q,text=t+'(3)',textcolor=col,color=color(na),style=label.style_label_up),b4=label.new(_n,_o,text='(4)'+t,textcolor=col,color=color(na),style=label.style_label_down),i=label.new(_l,_m,text=t+'(5)',textcolor=col,color=color(na),style=label.style_label_up),j=true,k=false,l=-1)), t3.g:=false
+        else
+            if _0 and _h.j==true
+                _h.T3()
+        _1= t5.get(0), _i:=_1.a.get_y1(), _j:=_1.e.get_x2(), _k:=_1.e.get_y2(), _2=math.abs(_k-_i), if _1.l==1 
+            _3=_1.e.get_y2(), T2=_1.T2(_v,_t,_r), if _r==_1.e.get_x2()and _m>_3-(_2*.854)and _q>_3-(_2*.854)and _o<_3
+                _4=_l-_t, if T2 and _1.p.get_x() > _r
+                    _1.lC.set_xy1(_n,_o), _1.lC.set_xy2(_l,_m), _1.r.set_xy(_l,_m), _1.u.set_lefttop(_l,_m), _1.u.set_right(_l+_4)
+                else
+                    _1.m:=line.new(_r,_s,_p,_q,color=col), _1.p:=label.new(_p,_q,text=t+'(a)',textcolor=col,color=color(na),style=label.style_label_up), _1.n:=line.new(_p,_q,_n,_o,color=col), _1.q:=label.new(_n,_o,text='(b)'+t,textcolor=col,color=color(na),style=label.style_label_down), _1.lC:=line.new(_n,_o,_l,_m,color=col), _1.r:=label.new(_l,_m,text=t+'(c)',textcolor=col,color=color(na),style=label.style_label_up), _1.u:=box.new(_l,_m,_l+_4,_q,bgcolor=color.new(col,93),border_color=color.new(col,65))
+            else
+                if T2 and _1.p.get_x() > _r
+                    _1.T4()
+        if _1.l == -1 
+            if _n==_1.r.get_x()and _m<_1.i.get_y()and _1.s==false
+                _1.s:=true, _1.t:=label.new(_l,_m,style=label.style_circle,color=color.new(col,65),yloc=yloc.belowbar,size=size.tiny)
+    if t5.size() > 0
+        _h:=t5.get(0), if _h.l==1 
+            if ta.crossunder(low , _h.u.get_bottom()) and bar_index <= _h.u.get_right()
+                label.new(bar_index,low,yloc=yloc.belowbar,style=label.style_xcross,color=#ff5252,size=size.tiny)
+        else
+            if ta.crossover(high, _h.u.get_top()) and bar_index <= _h.u.get_right()
+                label.new(bar_index,high,yloc=yloc.abovebar,style=label.style_xcross,color=#ff5252,size=size.tiny)
+    if barstate.islast
+        _1=t5.get(0), if t5.size()>1
+            _5=t5.get(1), _i:=_1.a.get_y1(), _j:=_1.e.get_x2(), _k:=_1.e.get_y2(), _2=math.abs(_k-_i), _6=_1.l==1, if _1.j==false or _1.r.get_x()>_1.i.get_x()
+                t3.a.set_xy1(na,na), t3.a.set_xy2(na,na), t3.b.set_xy1(na,na), t3.b.set_xy2(na,na), t3.c.set_xy1(na,na), t3.c.set_xy2(na,na), t3.d.set_xy1(na,na), t3.d.set_xy2(na,na), t3.e.set_xy1(na,na), t3.e.set_xy2(na,na), t3.f.set_color(color(na))
+            else
+                _C=bar_index+10, _D=_k+((_6?-1:1)*_2*.5), _E=_k+((_6?-1:1)*_2*.618), _F=_k+((_6?-1:1)*_2*.764), _G=_k+((_6?-1:1)*_2*.854), t3.a.set_xy1(_j,_D), t3.a.set_xy2(_C,_D), t3.b.set_xy1(_j,_E), t3.b.set_xy2(_C,_E), t3.c.set_xy1(_j,_F), t3.c.set_xy2(_C,_F), t3.d.set_xy1(_j,_G), t3.d.set_xy2(_C,_G), t3.e.set_xy1(_j,_k), t3.e.set_xy2(_j,_G), t3.f.get_line1().set_xy1(_j,_F), t3.f.get_line1().set_xy2(_C,_F), t3.f.get_line2().set_xy1(_j,_G), t3.f.get_line2().set_xy2(_C,_G)
+            if _1.g.get_x()==_5.r.get_x()
+                _1.f.set_textcolor(color(na)), _1.g.set_textcolor(color(na)), _5.q.set_text(str.replace(_5.q.get_text(),"(b)","(b)(1)",0)), _5.r.set_text(str.replace(_5.r.get_text(),"(c)","(c)(2)",0))
+        _7=t3.d.get_y1(), for i=0 to bar_index-t3.d.get_x1()
+            if _1.l == -1
+                if high[i] > _7
+                    t3.g:=true, break
+            else
+                if low [i] < _7
+                    t3.g:=true, break  
+        switch t3.g
+            true=>T5(t3,line.style_dotted,#ff52520d)
+            false=>T5(t3,line.style_solid,#00e6760d)
+            =>t3.a.set_xy1(na,na), t3.a.set_xy2(na,na), t3.b.set_xy1(na,na), t3.b.set_xy2(na,na), t3.c.set_xy1(na,na), t3.c.set_xy2(na,na), t3.d.set_xy1(na,na), t3.d.set_xy2(na,na), t3.e.set_xy1(na,na), t3.e.set_xy2(na,na), t3.f.set_color(color(na))
+    if t5.size() > 15 
+        pop=t5.pop(), pop.a.delete(), pop.f.delete(), pop.b.delete(), pop.g.delete(), pop.c.delete(), pop.h.delete(), pop.d.delete(), pop.b4.delete(), pop.e.delete(), pop.i.delete(), pop.m.delete(), pop.p.delete(), pop.n.delete(), pop.q.delete(), pop.lC.delete(), pop.r.delete(), pop.t.delete(), pop.u.delete()
+if input.bool(true, title="Elliott Wave")
+    draw(4,#ff5252,0), draw(8,#2196f3,1), draw(12,#ffffff,2)
